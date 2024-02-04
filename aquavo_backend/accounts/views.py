@@ -39,3 +39,16 @@ class UpdateUser(APIView):
                 "message": "Current User has not been updated",
                 "data": "The User Has not been Updated"
             }, status=HTTP_400_BAD_REQUEST)
+            
+class DeleteUserById(APIView):
+    serializer_class = UserSerializer
+    def delete(self, request, user_id, format=None):
+        """
+        Delete User by Id
+        """
+        CustomUser.objects.get(id=user_id).delete()
+        return Response({
+            "status": "OK",
+            "message": "User Deleted Successfully",
+            "data": "The User has been deleted Successfully"
+        }, status=HTTP_200_OK)
