@@ -7,3 +7,14 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
         depth = 1
         extra_kwargs = {'password': {'write_only': True}}
+        
+class RegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = [
+            "first_name",
+            "last_name",
+            "email",
+            "password",
+        ]
+        depth = 1

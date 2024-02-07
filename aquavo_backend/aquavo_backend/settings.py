@@ -17,6 +17,8 @@ import os
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aquavo_backend.settings')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
@@ -26,12 +28,18 @@ SECRET_KEY = 'django-insecure-oxl+#v0w_$n%^(pkb!fp&3wnq&y)9m^c9mk*&h(!@qtqf8mwz&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = []
+
+SECURE_SSL_REDIRECT = False
 
 # Application definition
 
 INSTALLED_APPS = [
+    'accounts',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,7 +49,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     
-    'accounts',
+    
     
 ]
 
@@ -92,6 +100,15 @@ DATABASES = {
     }
 }
 
+# Email Sent by SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_PASSWORD = 'rgnigadhpnyztdxm'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'aquavovender@gmail.com'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -117,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Africa/Addis_Ababa'
 
 USE_I18N = True
 
