@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from aquavo_backend.settings import EMAIL_HOST_USER
 from django.core.mail import send_mail
+from django.contrib.auth import logout
 
 
 # Create your views here.
@@ -127,3 +128,10 @@ class Register(APIView):
                 "message": "Failed to Register User",
                 "data": "Failed Registration"
             }, status=HTTP_400_BAD_REQUEST)
+            
+            
+class Logout(APIView):
+    def post(self, request, format=None):
+        request.user.auth_token.delete()
+        logout(request)
+        return Response({"message": "User has been Logged Out Successfully"})
