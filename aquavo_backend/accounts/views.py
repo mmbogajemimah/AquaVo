@@ -7,9 +7,11 @@ from .serializers import UserSerializer, RegistrationSerializer
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
-from aquavo_backend.settings import EMAIL_HOST_USER
+from aquavo_backend.settings import EMAIL_HOST_USER, TOKEN_EXPIRED_AFTER_SECONDS
 from django.core.mail import send_mail
 from django.contrib.auth import logout
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
 
 # Create your views here.
@@ -129,9 +131,53 @@ class Register(APIView):
                 "data": "Failed Registration"
             }, status=HTTP_400_BAD_REQUEST)
             
+@method_decorator(csrf_exempt, name='dispatch')
+class Login(APIView):
+    serializer_class = UserSerializer
+    def post(self, request, format=None):
+        # user_data = CustomUser.objects.get(email=request.data['username'])
+        username = request.data['username']
+        password = request.data['password']
+        
+        if username is None or password is None:
+            return Response({'error': "Provide your username and password kindly"}, status=HTTP_400_BAD_REQUEST)
+        user = authenticate(username=username, password=password)
+        if not user:
+            return Response({'error': "The Credentials provided are Invalid"}, status=HTTP_400_BAD_REQUEST)
+        else:
+            token, _ = Token.objects.get_or_create(user=user)
+            # token, _ = Token.objects.create(user=user)
+            is_expired, token = token_expire_handler(token)
+            single_user = CustomUser.objects.filter(id=token.user_id)
+            filtered_user = UserSerializer(single_user, many=True)
+            
+            return Response({
+                'user': filtered_user.data,
+                'Expiry_date': expires_in(token),
+                'Token Value': token.key
+            }, status=HTTP_200_OK)
             
 class Logout(APIView):
     def post(self, request, format=None):
         request.user.auth_token.delete()
         logout(request)
         return Response({"message": "User has been Logged Out Successfully"})
+    
+from django.utils import timezone
+import datetime
+from datetime import timedelta
+    
+def expires_in(token):
+    time_elapsed = timezone.now() - token.created
+    time_left = timedelta(seconds = TOKEN_EXPIRED_AFTER_SECONDS) - time_elapsed
+    return time_left
+
+def is_token_expired(token):
+    return expires_in(token) < timedelta(seconds = 0)
+    
+def token_expire_handler(token):
+    is_expired = is_token_expired(token)
+    if is_expired:
+        token.delete()
+        token = Token.objects.create(user = token.user)
+    return is_expired, token

@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'rest_framework.authtoken',
     
     
     
@@ -141,6 +142,8 @@ USE_I18N = True
 USE_TZ = True
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
+
+TOKEN_EXPIRED_AFTER_SECONDS = 86400
 
 
 # Static files (CSS, JavaScript, Images)
