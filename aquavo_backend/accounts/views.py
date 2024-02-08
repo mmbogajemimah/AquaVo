@@ -12,6 +12,11 @@ from django.core.mail import send_mail
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
+from aquavo_backend.views import AuthenticatedAPIView
+
+from django.utils import timezone
+import datetime
+from datetime import timedelta
 
 
 # Create your views here.
@@ -24,7 +29,7 @@ class AllUsers(APIView):
         return Response(all_users.data, status=HTTP_200_OK)
 
 # Gets a Single User in the System by their ID
-class GetUserById(APIView):
+class GetUserById(AuthenticatedAPIView):
     serializer_class = UserSerializer
     def get(self, request, user_id, format=None):
         user = CustomUser.objects.filter(id=user_id)
@@ -32,7 +37,7 @@ class GetUserById(APIView):
         return Response(one_user.data, status=HTTP_200_OK)
 
 #Updates Users Information
-class UpdateUser(APIView):
+class UpdateUser(AuthenticatedAPIView):
     serializer_class = UserSerializer
     def patch(self, request, user_id, format=None):
         one_user = CustomUser.objects.get(id=user_id)
@@ -49,7 +54,7 @@ class UpdateUser(APIView):
                 "data": "The User Has not been Updated"
             }, status=HTTP_400_BAD_REQUEST)
             
-class DeleteUserById(APIView):
+class DeleteUserById(AuthenticatedAPIView):
     serializer_class = UserSerializer
     def delete(self, request, user_id, format=None):
         """
@@ -154,18 +159,20 @@ class Login(APIView):
             return Response({
                 'user': filtered_user.data,
                 'Expiry_date': expires_in(token),
-                'Token Value': token.key
+                'token': token.key
             }, status=HTTP_200_OK)
             
-class Logout(APIView):
-    def post(self, request, format=None):
+
+from rest_framework.authtoken.models import Token
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.contrib.auth import logout
+
+class Logout(AuthenticatedAPIView):
+    def post(self,request,format=None):
         request.user.auth_token.delete()
         logout(request)
-        return Response({"message": "User has been Logged Out Successfully"})
-    
-from django.utils import timezone
-import datetime
-from datetime import timedelta
+        return Response({"message":"Logged Out"})
     
 def expires_in(token):
     time_elapsed = timezone.now() - token.created
