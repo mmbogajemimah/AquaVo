@@ -31,7 +31,10 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOWED_ORIGINS = []
+CORS_ALLOWED_ORIGINS = [
+     'http://localhost:3000',
+     'http://localhost:8000',
+]
 
 SECURE_SSL_REDIRECT = False
 
@@ -49,12 +52,11 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'rest_framework.authtoken',
-    
-    
-    
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -66,10 +68,12 @@ MIDDLEWARE = [
 
 REST_FRAMEWORK = {
    'DEFAULT_AUTHENTICATION_CLASSES': (
+       'rest_framework.authentication.SessionAuthentication',
        'rest_framework.authentication.TokenAuthentication',
    ),
    'DEFAULT_PERMISSION_CLASSES': ( 
-       'rest_framework.permissions.IsAdminUser', 
+    #    'rest_framework.permissions.IsAdminUser',
+       'rest_framework.permissions.AllowAny',
     ),
 }
 
@@ -152,7 +156,7 @@ USE_TZ = True
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
-TOKEN_EXPIRED_AFTER_SECONDS = 86400
+TOKEN_EXPIRED_AFTER_SECONDS = 365 * 24 * 60 * 60 
 
 
 # Static files (CSS, JavaScript, Images)

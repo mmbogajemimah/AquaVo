@@ -74,7 +74,7 @@ class Register(APIView):
         user_data = RegistrationSerializer(data=request.data)
         if user_data.is_valid():
             data_saved = user_data.save(password = make_password(request.data['password']))
-            data_saved.username = request.data['first_name'] + ' ' + request.data['last_name']
+            data_saved.username = request.data['firstname'] + ' ' + request.data['lastname']
             data_saved.save()
             email = request.data['email']
             html_content = f'''
@@ -151,9 +151,11 @@ class Login(APIView):
             return Response({'error': "The Credentials provided are Invalid"}, status=HTTP_400_BAD_REQUEST)
         else:
             token, _ = Token.objects.get_or_create(user=user)
+            print(token)
             # token, _ = Token.objects.create(user=user)
             is_expired, token = token_expire_handler(token)
             single_user = CustomUser.objects.filter(id=token.user_id)
+            print(single_user)
             filtered_user = UserSerializer(single_user, many=True)
             
             return Response({
