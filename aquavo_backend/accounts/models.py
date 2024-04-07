@@ -12,6 +12,8 @@ class CustomUser(AbstractUser):
     is_shop_owner  = models.BooleanField(default=False)
     phone_no = models.CharField(max_length = 20,blank=True)
     twofa_status = models.BooleanField(default=False)
+    estate = models.CharField(max_length=100, blank=True)
+    house_number = models.CharField(max_length=10, blank=True)
     
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
