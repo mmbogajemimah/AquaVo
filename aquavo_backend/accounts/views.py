@@ -1,9 +1,9 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import(HTTP_200_OK, HTTP_400_BAD_REQUEST)
+from rest_framework.status import(HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_201_CREATED)
 from .models import CustomUser
-from .serializers import UserSerializer, RegistrationSerializer
+from .serializers import UserSerializer, RegistrationSerializer, CustomerSerializer
 from django.contrib.auth.hashers import make_password
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
@@ -163,6 +163,14 @@ class Login(APIView):
                 'Expiry_date': expires_in(token),
                 'token': token.key
             }, status=HTTP_200_OK)
+            
+class CreateCustomer(APIView):
+    def post(self, request, format=None):
+        serializer = CustomerSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
             
 
 from rest_framework.authtoken.models import Token
