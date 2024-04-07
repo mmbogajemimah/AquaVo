@@ -18,3 +18,8 @@ class RegistrationSerializer(serializers.ModelSerializer):
             "password",
         ]
         depth = 1
+        
+class CustomerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomUser
+        fields = '__all__'
