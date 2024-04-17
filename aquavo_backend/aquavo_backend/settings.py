@@ -43,6 +43,7 @@ SECURE_SSL_REDIRECT = False
 INSTALLED_APPS = [
     'jazzmin',
     'accounts',
+    'refills',
     
     'django.contrib.admin',
     'django.contrib.auth',
