@@ -39,3 +39,15 @@ class GetAllRefillsView(APIView):
         }, status=HTTP_200_OK)
         
         
+class GetRefillsForUserView(APIView):
+    permission_classes = [IsAdminUser]
+    
+    def get(self, request, customer_id, format=None):
+        refills = Refill.objects.filter(customer_id=customer_id)
+        
+        serializer = RefillSerializer(refills, many=True)
+        
+        return Response({
+            'status': "success",
+            'data': serializer.data
+        }, status=HTTP_200_OK)
