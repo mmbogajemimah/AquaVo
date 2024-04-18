@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK
 from .models import Refill
 from .serializers import RefillSerializer
 from rest_framework.permissions import IsAdminUser
@@ -25,3 +25,17 @@ class CreateRefillView(APIView):
                 "message": "Invalid input data",
                 "errors": serializer.errors
             }, status=HTTP_400_BAD_REQUEST)
+            
+class GetAllRefillsView(APIView):
+    permission_classes = [IsAdminUser]
+    
+    def get(self, request, format=None):
+        refills = Refill.objects.all()
+        serializer = RefillSerializer(refills, many=True)
+        
+        return Response({
+            "status": "Success",
+            "data": serializer.data
+        }, status=HTTP_200_OK)
+        
+        
