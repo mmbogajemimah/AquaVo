@@ -51,12 +51,29 @@ class GetRefillsForUserView(APIView):
             'status': "success",
             'data': serializer.data
         }, status=HTTP_200_OK)
-        
-        
+      
+# Get Refill by Id
+class GetRefillByIdView(APIView):
+    permission_classes = [IsAdminUser] 
+    
+    def get(self, request, refill_id, format=None):
+        #Get the refill object by its Id
+        try:
+            refill = Refill.objects.get(id=refill_id)
+            serializer = RefillSerializer(refill)
+            return Response({
+                "status": "Success",
+                "data": serializer.data
+            }, status=HTTP_200_OK) 
+        except Refill.DoesNotExist:
+            return Response({
+                "status": "Failed to get Refill by Id",
+                "message": "Refill not found"
+            }, status=HTTP_404_NOT_FOUND)
 # Update Refill
 class UpdateRefillView(APIView):
     permission_classes = [IsAdminUser]
-    def put(self, request, refill_id, format=None):
+    def patch(self, request, refill_id, format=None):
         try:
             refill = Refill.objects.get(id=refill_id)
         except Refill.DoesNotExist:
