@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_404_NOT_FOUND
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_404_NOT_FOUND, HTTP_204_NO_CONTENT
 from .models import Refill
 from .serializers import RefillSerializer
 from rest_framework.permissions import IsAdminUser
@@ -71,4 +71,26 @@ class UpdateRefillView(APIView):
             return Response(serializer.data, status=HTTP_200_OK)
         else:
             return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        
+class DeleteRefillView(APIView):
+    #Only Admins can access this endpoint
+    permission_classes = [IsAdminUser]
+    
+    def delete(self, request, refill_id, format=None):
+        #Get the refill object based on the refill_id
+        try:
+            refill = Refill.objects.get(id=refill_id)
+        except Refill.DoesNotExist:
+            #If refill object is not found, return a 404 response
+            return Response(
+                {"detail": "Refill not found"},
+                status=HTTP_400_BAD_REQUEST
+            )
+        #Delete the refill object
+        refill.delete()
+        #Return a success messahe in the response
+        return Response(
+            {"message": "Refill deleted successfully"},
+            status=HTTP_204_NO_CONTENT
+        )
         
