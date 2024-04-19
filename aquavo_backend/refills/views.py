@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK
+from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_200_OK, HTTP_404_NOT_FOUND
 from .models import Refill
 from .serializers import RefillSerializer
 from rest_framework.permissions import IsAdminUser
@@ -51,3 +51,24 @@ class GetRefillsForUserView(APIView):
             'status': "success",
             'data': serializer.data
         }, status=HTTP_200_OK)
+        
+        
+# Update Refill
+class UpdateRefillView(APIView):
+    permission_classes = [IsAdminUser]
+    def put(self, request, refill_id, format=None):
+        try:
+            refill = Refill.objects.get(id=refill_id)
+        except Refill.DoesNotExist:
+            return Response(
+                {"detail": "Refill not found"},
+                status=HTTP_404_NOT_FOUND
+            )
+        serializer = RefillSerializer(refill, data=request.data)
+        #Check if the data is valid
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        
