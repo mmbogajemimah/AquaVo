@@ -7,24 +7,26 @@ from .serializers import RefillSerializer
 from rest_framework.permissions import IsAdminUser
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+from accounts.models import CustomUser
 
 # Create your views here.
-@method_decorator(csrf_exempt, name='dispatch')
+# @method_decorator(csrf_exempt, name='dispatch')
 class CreateRefillView(APIView):
     serializer_class = RefillSerializer
     permission_classes = [IsAdminUser]
     
     def post(self, request, format=None):
+        customer_name = request.data.get('customer_username')
+        print("Customer Name =>>",customer_name)
+        
+        request.data['customer_name'] = customer_name
         serializer = RefillSerializer(data=request.data)
+        print("Request Data :: ",request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(customer=request.user)
             return Response(serializer.data, status=HTTP_201_CREATED)
         else:
-            return Response({
-                "status": "Refill creation failed",
-                "message": "Invalid input data",
-                "errors": serializer.errors
-            }, status=HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
             
 class GetAllRefillsView(APIView):
     permission_classes = [IsAdminUser]
