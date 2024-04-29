@@ -184,6 +184,11 @@ class Logout(AuthenticatedAPIView):
         logout(request)
         return Response({"message":"Logged Out"})
     
+class TotalUsers(APIView):
+    def get(self, request, format=None):
+        total_users = CustomUser.objects.count()
+        return Response({ total_users}, status=HTTP_200_OK)
+    
 def expires_in(token):
     time_elapsed = timezone.now() - token.created
     time_left = timedelta(seconds = TOKEN_EXPIRED_AFTER_SECONDS) - time_elapsed
